@@ -44,7 +44,7 @@ describe('Login Component', () => {
     );
     
     expect(screen.getByText('QuickBite')).toBeInTheDocument();
-    expect(screen.getByText('Iniciar Sesión')).toBeInTheDocument();
+    expect(screen.getAllByText('Iniciar Sesión')[0]).toBeInTheDocument();
   });
 
   test('renders registration form when switching to register mode', () => {
@@ -89,13 +89,30 @@ describe('Login Component', () => {
     fireEvent.click(registerButton);
     
     const clientButton = screen.getByText('Soy Cliente');
-    const adminButton = screen.getByText('Soy Dueño / Restaurante');
+    const adminButton = screen.getByText('Soy Dueño');
     
     expect(clientButton).toBeInTheDocument();
     expect(adminButton).toBeInTheDocument();
     
     fireEvent.click(adminButton);
     expect(screen.getByText('Registro de Restaurante')).toBeInTheDocument();
+  });
+
+  test('switches to KITCHEN role in registration mode', () => {
+    render(
+      <BrowserRouter>
+        <Login />
+      </BrowserRouter>
+    );
+    
+    const registerButton = screen.getByText('Registrarse');
+    fireEvent.click(registerButton);
+    
+    const kitchenButton = screen.getByText('Soy Cocinero');
+    expect(kitchenButton).toBeInTheDocument();
+    
+    fireEvent.click(kitchenButton);
+    expect(screen.getByText('Registro de Cocinero')).toBeInTheDocument();
   });
 
   test('handles form input changes', () => {
@@ -131,7 +148,7 @@ describe('Login Component', () => {
     
     const emailInput = screen.getByPlaceholderText('correo@ejemplo.com');
     const passwordInput = screen.getByPlaceholderText('••••••••');
-    const submitButton = screen.getByText('Iniciar Sesión');
+    const submitButton = document.querySelector('button[type="submit"]');
     
     fireEvent.change(emailInput, { target: { name: 'email', value: 'test@example.com' } });
     fireEvent.change(passwordInput, { target: { name: 'password', value: 'password123' } });
@@ -169,7 +186,7 @@ describe('Login Component', () => {
     const passwordInput = screen.getByPlaceholderText('••••••••');
     const firstNameInput = screen.getByPlaceholderText('Juan');
     const lastNameInput = screen.getByPlaceholderText('Pérez');
-    const submitButton = screen.getByText('Registrarse');
+    const submitButton = document.querySelector('button[type="submit"]');
     
     fireEvent.change(usernameInput, { target: { name: 'username', value: 'testuser' } });
     fireEvent.change(emailInput, { target: { name: 'email', value: 'test@example.com' } });
@@ -197,7 +214,7 @@ describe('Login Component', () => {
     
     const emailInput = screen.getByPlaceholderText('correo@ejemplo.com');
     const passwordInput = screen.getByPlaceholderText('••••••••');
-    const submitButton = screen.getByText('Iniciar Sesión');
+    const submitButton = document.querySelector('button[type="submit"]');
     
     fireEvent.change(emailInput, { target: { name: 'email', value: 'test@example.com' } });
     fireEvent.change(passwordInput, { target: { name: 'password', value: 'wrongpassword' } });
@@ -219,7 +236,7 @@ describe('Login Component', () => {
     
     const emailInput = screen.getByPlaceholderText('correo@ejemplo.com');
     const passwordInput = screen.getByPlaceholderText('••••••••');
-    const submitButton = screen.getByText('Iniciar Sesión');
+    const submitButton = document.querySelector('button[type="submit"]');
     
     fireEvent.change(emailInput, { target: { name: 'email', value: 'test@example.com' } });
     fireEvent.change(passwordInput, { target: { name: 'password', value: 'password123' } });
@@ -251,7 +268,7 @@ describe('Login Component', () => {
     
     const emailInput = screen.getByPlaceholderText('correo@ejemplo.com');
     const passwordInput = screen.getByPlaceholderText('••••••••');
-    const submitButton = screen.getByText('Iniciar Sesión');
+    const submitButton = document.querySelector('button[type="submit"]');
     
     fireEvent.change(emailInput, { target: { name: 'email', value: 'test@example.com' } });
     fireEvent.change(passwordInput, { target: { name: 'password', value: 'password123' } });

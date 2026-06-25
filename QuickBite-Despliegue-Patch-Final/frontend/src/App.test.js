@@ -1,11 +1,16 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 
 // Mock del CartContext
 jest.mock('./context/CartContext', () => ({
   CartProvider: ({ children }) => <div>{children}</div>,
+  useCart: () => ({
+    cart: [],
+    isCartOpen: true,
+    toggleCart: jest.fn(),
+    clearCart: jest.fn()
+  })
 }));
 
 // Mock de react-toastify
@@ -15,33 +20,21 @@ jest.mock('react-toastify', () => ({
 
 describe('App Component', () => {
   test('renders Navbar component', () => {
-    render(
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    );
+    render(<App />);
     // Verifica que el componente Navbar se renderiza
     const navbarElement = screen.getByRole('navigation');
     expect(navbarElement).toBeInTheDocument();
   });
 
   test('renders CartSidebar component', () => {
-    render(
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    );
+    render(<App />);
     // Verifica que el componente CartSidebar se renderiza
     const cartSidebarElement = screen.getByTestId('cart-sidebar');
     expect(cartSidebarElement).toBeInTheDocument();
   });
 
   test('renders ToastContainer', () => {
-    render(
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    );
+    render(<App />);
     // Verifica que el ToastContainer se renderiza
     const toastContainer = screen.getByTestId('toast-container');
     expect(toastContainer).toBeInTheDocument();
@@ -55,11 +48,7 @@ describe('App Component', () => {
     // Limpiar sessionStorage para simular primera carga
     sessionStorage.clear();
     
-    render(
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    );
+    render(<App />);
     
     // Verifica que se limpiaron los items de localStorage
     expect(removeItemSpy).toHaveBeenCalledWith('token');
@@ -79,16 +68,12 @@ describe('App Component', () => {
     // Simular que ya se inicializó
     sessionStorage.setItem('quickbite_initialized', 'true');
     
-    render(
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    );
+    render(<App />);
     
     // Verifica que NO se limpiaron los items de localStorage
     expect(removeItemSpy).not.toHaveBeenCalled();
     
     // Limpiar mocks
     removeItemSpy.mockRestore();
-    });
+  });
 });

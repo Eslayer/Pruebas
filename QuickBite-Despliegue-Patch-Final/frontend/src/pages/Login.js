@@ -91,12 +91,23 @@ const Login = () => {
       }
     } catch (error) {
       console.warn('Servidor backend offline. Iniciando sesión local de prueba.');
+      
+      let determinedRole = formData.role || 'CLIENT';
+      if (!isRegistering && formData.email) {
+        const emailLower = formData.email.toLowerCase();
+        if (emailLower.includes('kitchen') || emailLower.includes('cocinero')) {
+          determinedRole = 'KITCHEN';
+        } else if (emailLower.includes('admin')) {
+          determinedRole = 'ADMIN';
+        }
+      }
+
       const mockUser = {
         accessToken: 'mock-customer-token',
         userId: '1',
         username: formData.email ? formData.email.split('@')[0] : 'customer',
         email: formData.email || 'customer@quickbite.com',
-        role: formData.role || 'CLIENT'
+        role: determinedRole
       };
       
       localStorage.setItem('token', mockUser.accessToken);
@@ -127,6 +138,16 @@ const Login = () => {
     }
   };
 
+  const handleQuickLogin = (email, password, role) => {
+    setFormData(prev => ({
+      ...prev,
+      email: email,
+      password: password,
+      role: role
+    }));
+    toast.info(`Campos de prueba rellenados para: ${role === 'CLIENT' ? 'Cliente' : role === 'KITCHEN' ? 'Cocinero' : 'Administrador'}`);
+  };
+
   
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -141,12 +162,20 @@ const Login = () => {
           </div>
           <h2 className="mt-6 text-3xl font-extrabold text-secondary-900">
             {isRegistering 
-              ? (formData.role === 'ADMIN' ? 'Registro de Restaurante' : 'Registro de Cliente') 
+              ? (formData.role === 'ADMIN' 
+                  ? 'Registro de Restaurante' 
+                  : formData.role === 'KITCHEN' 
+                    ? 'Registro de Cocinero' 
+                    : 'Registro de Cliente') 
               : 'QuickBite'}
           </h2>
           <p className="mt-2 text-sm text-gray-600">
             {isRegistering 
-              ? (formData.role === 'ADMIN' ? 'Gestiona tu restaurante y aumenta tus ventas' : 'Pide tu comida favorita en minutos') 
+              ? (formData.role === 'ADMIN' 
+                  ? 'Gestiona tu restaurante y aumenta tus ventas' 
+                  : formData.role === 'KITCHEN' 
+                    ? 'Prepara y gestiona comandas en tiempo real' 
+                    : 'Pide tu comida favorita en minutos') 
               : 'Sistema de Gestión de Restaurantes'}
           </p>
         </div>
@@ -171,11 +200,11 @@ const Login = () => {
           <form className="space-y-6" onSubmit={handleSubmit}>
             {isRegistering && (
               <>
-                <div className="flex justify-center space-x-4 mb-6">
+                <div className="grid grid-cols-3 gap-2 mb-6">
                   <button
                     type="button"
                     onClick={() => setFormData({ ...formData, role: 'CLIENT' })}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    className={`px-2 py-2 rounded-lg text-xs font-medium text-center transition-all ${
                       formData.role === 'CLIENT'
                         ? 'bg-primary text-white shadow-md'
                         : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
@@ -185,14 +214,25 @@ const Login = () => {
                   </button>
                   <button
                     type="button"
+                    onClick={() => setFormData({ ...formData, role: 'KITCHEN' })}
+                    className={`px-2 py-2 rounded-lg text-xs font-medium text-center transition-all ${
+                      formData.role === 'KITCHEN'
+                        ? 'bg-primary text-white shadow-md'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    }`}
+                  >
+                    Soy Cocinero
+                  </button>
+                  <button
+                    type="button"
                     onClick={() => setFormData({ ...formData, role: 'ADMIN' })}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    className={`px-2 py-2 rounded-lg text-xs font-medium text-center transition-all ${
                       formData.role === 'ADMIN'
                         ? 'bg-primary text-white shadow-md'
                         : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                     }`}
                   >
-                    Soy Dueño / Restaurante
+                    Soy Dueño
                   </button>
                 </div>
 
@@ -301,11 +341,40 @@ const Login = () => {
           </form>
 
           {!isRegistering && (
-            <div className="mt-6 p-4 bg-gray-50 rounded-md">
-              <p className="text-sm font-medium text-gray-700 mb-2">Sugerencia:</p>
-              <div className="space-y-1 text-xs text-gray-600">
-                <p>Si es tu primera vez, usa la pestaña <strong>Registrarse</strong> para crear tu cuenta Admin.</p>
+            <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Acceso Rápido (Demos / Pruebas)</p>
+              <div className="grid grid-cols-3 gap-2">
+                <button
+                  type="button"
+                  onClick={() => handleQuickLogin('customer@quickbite.com', 'customer123', 'CLIENT')}
+                  className="flex flex-col items-center justify-center p-2 rounded-lg bg-white border border-gray-200 hover:border-primary hover:bg-blue-50 transition-all text-center"
+                >
+                  <User className="h-5 w-5 text-indigo-500 mb-1" />
+                  <span className="text-xs font-semibold text-gray-750">Cliente</span>
+                  <span className="text-[10px] text-gray-400">customer@...</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleQuickLogin('kitchen@quickbite.com', 'kitchen123', 'KITCHEN')}
+                  className="flex flex-col items-center justify-center p-2 rounded-lg bg-white border border-gray-200 hover:border-primary hover:bg-blue-50 transition-all text-center"
+                >
+                  <ChefHat className="h-5 w-5 text-orange-500 mb-1" />
+                  <span className="text-xs font-semibold text-gray-750">Cocinero</span>
+                  <span className="text-[10px] text-gray-400">kitchen@...</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleQuickLogin('admin@quickbite.com', 'admin123', 'ADMIN')}
+                  className="flex flex-col items-center justify-center p-2 rounded-lg bg-white border border-gray-200 hover:border-primary hover:bg-blue-50 transition-all text-center"
+                >
+                  <Store className="h-5 w-5 text-emerald-500 mb-1" />
+                  <span className="text-xs font-semibold text-gray-750">Admin</span>
+                  <span className="text-[10px] text-gray-400">admin@...</span>
+                </button>
               </div>
+              <p className="text-[10px] text-gray-500 mt-2 text-center">
+                Nota: Al hacer clic en un rol, se auto-rellenan sus credenciales y rol de prueba.
+              </p>
             </div>
           )}
         </div>

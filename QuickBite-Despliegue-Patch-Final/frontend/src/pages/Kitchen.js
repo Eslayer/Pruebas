@@ -5,10 +5,21 @@ import { useNavigate } from 'react-router-dom';
 import QuickBiteLogo from '../components/QuickBiteLogo';
 import apiURL from '../utils/api';
 
+const defaultRestaurants = [
+  { id: 1, name: 'Burger Queen', category: 'Hamburguesas' },
+  { id: 2, name: 'Pizza Hub', category: 'Pizzas' },
+  { id: 3, name: 'Taco Fiesta', category: 'Tacos' },
+  { id: 4, name: 'Sushi Zen', category: 'Sushi' },
+  { id: 5, name: 'Green Bowl', category: 'Ensaladas' },
+  { id: 6, name: 'El Asador', category: 'Carnes' },
+  { id: 7, name: 'Wok Express', category: 'Asiática' },
+  { id: 8, name: 'La Crêperie', category: 'Postres' }
+];
+
 const Kitchen = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [restaurants, setRestaurants] = useState([]);
+  const [restaurants, setRestaurants] = useState(defaultRestaurants);
   const [selectedRestaurant, setSelectedRestaurant] = useState('ALL');
   const [stats, setStats] = useState({
     pending: 0,
@@ -48,10 +59,26 @@ const Kitchen = () => {
       const response = await fetch(apiURL('/api/restaurants'));
       if (response.ok) {
         const data = await response.json();
-        setRestaurants(data);
+        const apiList = Array.isArray(data) ? data : [];
+        
+        // Combinar los predeterminados y los recibidos por la API eliminando duplicados por ID y por Nombre
+        const merged = [...apiList];
+        defaultRestaurants.forEach(defRest => {
+          const exists = merged.some(
+            r => r.id === defRest.id || (r.name && r.name.toLowerCase() === defRest.name.toLowerCase())
+          );
+          if (!exists) {
+            merged.push(defRest);
+          }
+        });
+        
+        setRestaurants(merged);
+      } else {
+        setRestaurants(defaultRestaurants);
       }
     } catch (error) {
-      console.error('Error al cargar restaurantes:', error);
+      console.error('Error al cargar restaurantes, usando predeterminados:', error);
+      setRestaurants(defaultRestaurants);
     }
   };
 

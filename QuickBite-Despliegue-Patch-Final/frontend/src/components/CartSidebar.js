@@ -140,7 +140,7 @@ const CartSidebar = () => {
         onClick={toggleCart}
       />
       
-      <div className="fixed inset-y-0 right-0 w-full max-w-md bg-white shadow-2xl z-[70] transform transition-transform flex flex-col">
+      <div data-testid="cart-sidebar" className="fixed inset-y-0 right-0 w-full max-w-md bg-white shadow-2xl z-[70] transform transition-transform flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-100">
           <div className="flex items-center text-gray-800">
