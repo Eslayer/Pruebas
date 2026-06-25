@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Star, MapPin, Clock, Filter, Store, Truck, ArrowRight, Edit2 } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import apiURL from '../utils/api';
 const chileanCommunes = [
   'Providencia, Región Metropolitana',
   'Santiago Centro, Región Metropolitana',
@@ -56,7 +57,7 @@ const Restaurants = () => {
   useEffect(() => {
     const loadRestaurants = async () => {
       try {
-        const response = await fetch('/api/restaurants/active');
+        const response = await fetch(apiURL('/api/restaurants/active'));
         if (!response.ok) return;
         const data = await response.json();
         const mapped = data.map((r, i) => ({

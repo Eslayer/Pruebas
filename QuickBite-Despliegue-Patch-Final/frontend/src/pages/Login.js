@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { ChefHat, Eye, EyeOff, User, Lock, Store } from 'lucide-react';
 import QuickBiteLogo from '../components/QuickBiteLogo';
+import apiURL from '../utils/api';
 
 const Login = () => {
   const [isRegistering, setIsRegistering] = useState(false);
@@ -58,7 +59,7 @@ const Login = () => {
         password: formData.password
       };
 
-      const response = await fetch(url, {
+      const response = await fetch(apiURL(url), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
